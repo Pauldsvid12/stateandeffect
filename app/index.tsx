@@ -3,7 +3,7 @@ import {View, ImageBackground, StatusBar} from 'react-native';
 import {useRouter} from 'expo-router';
 import {CustomText} from '../components/ui/CustomText';
 import {CustomButton} from '../components/ui/CustomButton';
-import "./globla.css"
+import './global.css';
 
 export default function WelcomeScreen() {
   const router = useRouter();
