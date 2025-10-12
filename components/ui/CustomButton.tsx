@@ -1,6 +1,7 @@
 import React from 'react';
-import { ActivityIndicator, TouchableOpacity, TouchableOpacityProps } from 'react-native'; // Indicar carga ,Opaciadad al hacer click, Lo mismo para las propiedades
+import { ActivityIndicator, TouchableOpacity, TouchableOpacityProps, View } from 'react-native'; // Indicar carga ,Opaciadad al hacer click, Lo mismo para las propiedades
 import { CustomText } from './CustomText';
+import { Ionicons } from '@expo/vector-icons';
 
 interface CustomButtonProps extends TouchableOpacityProps{
   title:string;
@@ -8,6 +9,7 @@ interface CustomButtonProps extends TouchableOpacityProps{
   size?:'small' | 'medium' | 'large';
   isLoading?:boolean;
   className?:string;
+  iconName?: keyof typeof Ionicons.glyphMap;
 }
 export const CustomButton: React.FC<CustomButtonProps> = ({
   title,
@@ -16,6 +18,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
   isLoading=false,
   className='',
   disabled,
+  iconName,
   ...props
 })=>{
   const getVariantStyles =()=>{
@@ -57,15 +60,21 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
       disabled={isDisabled}
       {...props}
     >
-      {isLoading ? (
+      {isLoading ?(
         <ActivityIndicator color={variant === 'outline' ? '#FFFFFF' : '#000000'} />
-      ) : (
-        <CustomText 
-          variant="button" 
-          className={`font-bold ${getTextColor()}`}
-        >
-          {title}
-        </CustomText>
+      ):(
+        <View className="flex-row items-center gap-2">
+          {iconName && (
+            <Ionicons 
+              name={iconName} 
+              size={20} 
+              color={variant === 'outline' ? '#FFFFFF' : '#000000'} 
+            />
+          )}
+          <CustomText variant="button" className={`font-bold ${getTextColor()}`}>
+            {title}
+          </CustomText>
+        </View>
       )}
     </TouchableOpacity>
   );

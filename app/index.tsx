@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {View, ImageBackground, StatusBar} from 'react-native';
-import {useRouter} from 'expo-router';
-import {CustomText} from '../components/ui/CustomText';
-import {CustomButton} from '../components/ui/CustomButton';
-import './global.css';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Image, ImageBackground, StatusBar, View } from 'react-native';
+import { CustomButton } from '../components/ui/CustomButton';
+import { CustomText } from '../components/ui/CustomText';
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -16,10 +15,10 @@ export default function WelcomeScreen() {
     return () => clearTimeout(timer);
   }, []);
   const handleRegister = () => {
-    router.push('./auth/register');
+    router.push('/auth/register' as any);
   };
   const handleLogin = () => {
-    router.push('./auth/login');
+    router.push('/auth/login' as any);
   };
   if (!isLoaded) {
     return (
@@ -37,14 +36,16 @@ export default function WelcomeScreen() {
         className="flex-1"
         resizeMode="cover"
       >
-        {/* Overlay*/}
+        {/*Overlay*/}
         <View className="flex-1 bg-black/60">
           {/* Logo y título*/}
           <View className="flex-1 justify-center items-center px-6">
             <View className="items-center mb-8">
-              {/*Aquí va el logo de Spotify*/}
+              {}
               <CustomText variant="heading" className="text-5xl mb-4">
-                ♪
+              <Image
+                source={{ uri: 'https://images.icon-icons.com/3041/PNG/512/spotify_logo_icon_189218.png' }}
+              ></Image>
               </CustomText>
               <CustomText variant="heading" className="tracking-wider">
                 Spotify
@@ -76,13 +77,15 @@ export default function WelcomeScreen() {
               title="Iniciar sesión con Google"
               variant="secondary"
               size="large"
+              iconName="logo-google"
               onPress={() => {}}
               className="w-full"
             />
             <CustomButton
-              title="Iniciar sesión con Facebook"
+              title="Iniciar sesión con Google"
               variant="secondary"
               size="large"
+              iconName="logo-facebook"
               onPress={() => {}}
               className="w-full"
             />
