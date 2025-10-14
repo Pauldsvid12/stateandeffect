@@ -1,8 +1,7 @@
-import {useRouter } from 'expo-router';
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState} from 'react';
-import {KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View} from 'react-native';
-import {CustomButton} from '../ui/CustomButton';
-import {CustomText} from '../ui/CustomText';
+import { CustomButton } from '../ui/CustomButton';
+import { CustomText } from '../ui/CustomText';
 
 interface LoginFormData {
   email: string;
@@ -13,61 +12,69 @@ interface LoginErrors {
   password?: string;
   general?: string;
 }
-export const Login: React.FC = ()=>{
-  const router = useRouter();
-  const [formData, setFormData]=useState<LoginFormData>({
+interface LoginProps {
+  onLoginSuccess: () => void;
+  onSwitchToRegister: () => void;
+  onBack: () => void;
+}
+export const Login: React.FC<LoginProps> = ({ 
+  onLoginSuccess, 
+  onSwitchToRegister, 
+  onBack 
+}) => {
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
-  const [errors, setErrors]=useState<LoginErrors>({});
-  const [isLoading, setIsLoading]=useState<boolean>(false);
-  const [passwordVisible, setPasswordVisible]=useState<boolean>(false);
-  const [rememberMe, setRememberMe]=useState<boolean>(false);
-  useEffect(()=>{
-    if (formData.email && errors.email){
+  const [errors, setErrors] = useState<LoginErrors>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+
+  useEffect(() => {//validar el email
+    if (formData.email && errors.email) {
       validateEmail(formData.email);
     }
-  },[formData.email]);
-  const validateEmail=(email: string): boolean =>{ //validar correo
-    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  }, [formData.email]);
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setErrors(prev => ({...prev, email: 'Correo electrónico inválido'}));
+      setErrors(prev => ({ ...prev, email: 'Correo electrónico inválido' }));
       return false;
     }
-    setErrors(prev =>({...prev, email: undefined}));
+    setErrors(prev => ({ ...prev, email: undefined }));
     return true;
   };
-  const validateForm=(): boolean=>{
-    const newErrors: LoginErrors={};
-    if(!formData.email.trim()){
-      newErrors.email='El correo es requerido';
-    }else if(!validateEmail(formData.email)){
-      newErrors.email='Correo electrónico inválido';
+  const validateForm = (): boolean => {
+    const newErrors: LoginErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = 'El correo es requerido';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Correo electrónico inválido';
     }
-    if(!formData.password){
-      newErrors.password='La contraseña es requerida';
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es requerida';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  const handleLoginm= async()=>{
-    if(!validateForm()) return;
+  const handleLogin = async () => {
+    if (!validateForm()) return;
     setIsLoading(true);
     setErrors({});
-    setTimeout(() =>{
+    setTimeout(() => {//se simula el logueo
       setIsLoading(false);
-      if(formData.email ==='demo@spotify.com' && formData.password === 'password') {//simular validacion
+      if (formData.email === 'paul.juelam.est@uets.edu.ec' && formData.password === 'edgewwe123') {//validacion de los datos
         console.log('Login exitoso:', formData);
-      }else{
-        setErrors({ general: 'Correo o contraseña incorrectos'});
+        onLoginSuccess();
+      } else {
+        setErrors({ general: 'Correo o contraseña incorrectos' });
       }
     }, 2000);
   };
-  const handleInputChange=(field: keyof LoginFormData, value: string)=>{
-    setFormData(prev=>({...prev, [field]: value}));
-    // Limpiar error general al cambiar campos
-    if (errors.general) {
+  const handleInputChange = (field: keyof LoginFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors.general) {//eliminar el error al cambiar los datos
       setErrors(prev => ({ ...prev, general: undefined }));
     }
   };
@@ -87,7 +94,7 @@ export const Login: React.FC = ()=>{
       >
         {/*Header*/}
         <View className="mb-8">
-          <TouchableOpacity onPress={() => router.back()} className="mb-6">
+          <TouchableOpacity onPress={onBack} className="mb-6">
             <CustomText variant="title" className="text-spotify-gray-light">
               ← Atrás
             </CustomText>
@@ -99,24 +106,27 @@ export const Login: React.FC = ()=>{
             Accede a tu cuenta de Spotify
           </CustomText>
         </View>
-        {/*Social Login Buttons*/}
+        {/*Login con otras redes*/}
         <View className="gap-3 mb-6">
           <CustomButton
             title="Continuar con Google"
             variant="secondary"
             size="medium"
+            iconName="logo-google"
             onPress={() => handleSocialLogin('Google')}
           />
           <CustomButton
             title="Continuar con Facebook"
             variant="secondary"
             size="medium"
+            iconName="logo-facebook"
             onPress={() => handleSocialLogin('Facebook')}
           />
           <CustomButton
             title="Continuar con Apple"
             variant="secondary"
             size="medium"
+            iconName="logo-apple"
             onPress={() => handleSocialLogin('Apple')}
           />
         </View>
@@ -138,7 +148,7 @@ export const Login: React.FC = ()=>{
         )}
         {/*Form*/}
         <View className="gap-4">
-          {/*Ingresar correo*/}
+          {/*ingresar email*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Correo electrónico o nombre de usuario
@@ -182,7 +192,7 @@ export const Login: React.FC = ()=>{
               </CustomText>
             )}
           </View>
-          {/*Ver o no ver contraseña*/}
+          {/*ver o no ver contraseña*/}
           <TouchableOpacity 
             onPress={() => setPasswordVisible(!passwordVisible)}
             className="self-start"
@@ -209,38 +219,38 @@ export const Login: React.FC = ()=>{
               Recuérdame
             </CustomText>
           </TouchableOpacity>
-          {/*Login Button*/}
+          {/*Boton de login*/}
           <CustomButton
             title="Iniciar sesión"
             variant="primary"
             size="large"
-            onPress={handleLoginm}
+            onPress={handleLogin}
             isLoading={isLoading}
             className="mt-4"
           />
-          {/*Olvidar contraseñas*/}
+          {/*Olvidaste tu contraseña*/}
           <TouchableOpacity className="self-center mt-2">
             <CustomText variant="body" className="text-white underline">
               ¿Olvidaste tu contraseña?
             </CustomText>
           </TouchableOpacity>
-          {/*Dividir*/}
+          {/*dividir*/}
           <View className="h-[1px] bg-spotify-gray my-4" />
-          {/*Register Link*/}
+          {/*Link para registrase*/}
           <View className="flex-row justify-center items-center">
             <CustomText variant="body" className="text-spotify-gray-light">
               ¿No tienes cuenta?{' '}
             </CustomText>
-            <TouchableOpacity onPress={() => router.push('./auth/register')}>
+            <TouchableOpacity onPress={onSwitchToRegister}>
               <CustomText variant="body" className="text-spotify-green font-bold">
                 Regístrate en Spotify
               </CustomText>
             </TouchableOpacity>
           </View>
-          {/*Demo credentials hint*/}
+          {/* DATOS A INGRESAR*/}
           <View className="mt-8 p-4 bg-spotify-green/10 rounded-lg border border-spotify-green/30">
             <CustomText variant="caption" className="text-spotify-green text-center">
-              Demo: demo@spotify.com / password
+              Probar: paul.juelam.est@uets.edu.ec / edgewwe321
             </CustomText>
           </View>
         </View>

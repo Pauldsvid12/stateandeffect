@@ -1,88 +1,98 @@
-import {useRouter} from 'expo-router'; //para navegar
-import React, {useEffect, useState} from 'react';
-import {KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View} from 'react-native'; //Para que el teclado no tape los campos de entradas, 
-import {CustomButton} from '../ui/CustomButton';
-import {CustomText} from '../ui/CustomText';
+import {View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { CustomText } from '../ui/CustomText';
+import { CustomButton } from '../ui/CustomButton';
 
 interface FormData {
-  email:string;
-  password:string;
-  confirmPassword:string;
-  username:string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  username: string;
 }
 interface FormErrors {
-  email?:string;
-  password?:string;
-  confirmPassword?:string;
-  username?:string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  username?: string;
 }
-export const Register: React.FC =()=>{
-  const router=useRouter();
-  const [formData, setFormData]=useState<FormData>({
-    email:'',
-    password:'',
-    confirmPassword:'',
-    username:'',
+interface RegisterProps {
+  onRegisterSuccess: () => void;
+  onSwitchToLogin: () => void;
+  onBack: () => void;
+}
+export const Register: React.FC<RegisterProps> = ({ 
+  onRegisterSuccess, 
+  onSwitchToLogin, 
+  onBack 
+}) => {
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    username: '',
   });
-  const [errors, setErrors]=useState<FormErrors>({});
-  const [isLoading, setIsLoading]=useState<boolean>(false);
-  const [passwordVisible, setPasswordVisible]=useState<boolean>(false);
-  useEffect(()=>{//para validar
-    if(formData.email && errors.email){
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+
+  useEffect(() => {//validacion en tiempo real
+    if (formData.email && errors.email) {
       validateEmail(formData.email);
     }
   }, [formData.email]);
-  const validateEmail=(email: string):boolean=>{
-    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!emailRegex.test(email)){
-      setErrors(prev =>({ ...prev, email: 'Correo electrónico inválido' }));
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrors(prev => ({ ...prev, email: 'Correo electrónico inválido' }));
       return false;
     }
-    setErrors(prev =>({ ...prev, email: undefined }));
+    setErrors(prev => ({ ...prev, email: undefined }));
     return true;
   };
-  const validatePassword =(password: string): boolean =>{
-    if(password.length<8){
-      setErrors(prev =>({ ...prev, password: 'La contraseña debe tener al menos 8 caracteres' }));
+  const validatePassword = (password: string): boolean => {
+    if (password.length < 8) {
+      setErrors(prev => ({ ...prev, password: 'La contraseña debe tener al menos 8 caracteres' }));
       return false;
     }
-    setErrors(prev =>({ ...prev, password: undefined }));
+    setErrors(prev => ({ ...prev, password: undefined }));
     return true;
   };
-  const validateForm =(): boolean =>{
-    const newErrors: FormErrors={};
-    if(!formData.username.trim()){
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    if (!formData.username.trim()) {
       newErrors.username = 'El nombre de usuario es requerido';
     }
-    if(!formData.email.trim()){
+    if (!formData.email.trim()) {
       newErrors.email = 'El correo es requerido';
     } else if (!validateEmail(formData.email)) {
       newErrors.email = 'Correo electrónico inválido';
     }
-    if(!formData.password){
-      newErrors.password='La contraseña es requerida';
-    }else if(!validatePassword(formData.password)){
-      newErrors.password='La contraseña debe tener al menos 8 caracteres';
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es requerida';
+    } else if (!validatePassword(formData.password)) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
     }
-    if(formData.password!==formData.confirmPassword){
-      newErrors.confirmPassword='Las contraseñas no coinciden';
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  const handleRegister = async() =>{
-    if(!validateForm()) return;
-    setIsLoading(true);   
-    setTimeout(() => { //registro (solo mensaje en consola)
+
+  const handleRegister = async () => {
+    if (!validateForm()) return;
+    setIsLoading(true);
+    setTimeout(() => {//simular registro
       setIsLoading(false);
       console.log('Registro exitoso:', formData);
+      onRegisterSuccess();
     }, 2000);
   };
-  const handleInputChange = (field: keyof FormData, value: string) =>{
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
-  return(
+  return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
@@ -93,11 +103,12 @@ export const Register: React.FC =()=>{
       >
         {/*Header*/}
         <View className="mb-8">
-          <TouchableOpacity onPress={() => router.back()} className="mb-6">
+          <TouchableOpacity onPress={onBack} className="mb-6">
             <CustomText variant="title" className="text-spotify-gray-light">
               ← Atrás
             </CustomText>
           </TouchableOpacity>
+
           <CustomText variant="heading" className="mb-2">
             Crear cuenta
           </CustomText>
@@ -107,7 +118,7 @@ export const Register: React.FC =()=>{
         </View>
         {/*Form*/}
         <View className="gap-4">
-          {/*Username Input*/}
+          {/*Ingresar nombre del usuario*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Nombre de usuario
@@ -128,7 +139,7 @@ export const Register: React.FC =()=>{
               </CustomText>
             )}
           </View>
-          {/*Email Input*/}
+          {/*Ingresar correo*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Correo electrónico
@@ -150,7 +161,7 @@ export const Register: React.FC =()=>{
               </CustomText>
             )}
           </View>
-          {/*Password Input*/}
+          {/*Ingresar contraseña*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Contraseña
@@ -172,7 +183,7 @@ export const Register: React.FC =()=>{
               </CustomText>
             )}
           </View>
-          {/*Confirm Password Input*/}
+          {/*Ingresar confimacion de la contraseña*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Confirmar contraseña
@@ -194,8 +205,7 @@ export const Register: React.FC =()=>{
               </CustomText>
             )}
           </View>
-
-          {/*Toggle Password Visibility*/}
+          {/*Ver o no ver contraseña*/}
           <TouchableOpacity 
             onPress={() => setPasswordVisible(!passwordVisible)}
             className="self-start"
@@ -204,7 +214,7 @@ export const Register: React.FC =()=>{
               {passwordVisible ? 'Ocultar contraseñas' : 'Mostrar contraseñas'}
             </CustomText>
           </TouchableOpacity>
-          {/*Register Button*/}
+          {/*boton de registro*/}
           <CustomButton
             title="Registrarse"
             variant="primary"
@@ -213,18 +223,18 @@ export const Register: React.FC =()=>{
             isLoading={isLoading}
             className="mt-4"
           />
-          {/*Login Link*/}
+          {/*Ir a loguearte*/}
           <View className="flex-row justify-center items-center mt-6">
             <CustomText variant="body" className="text-spotify-gray-light">
               ¿Ya tienes cuenta?{' '}
             </CustomText>
-            <TouchableOpacity onPress={() => router.push('./auth/login')}>
+            <TouchableOpacity onPress={onSwitchToLogin}>
               <CustomText variant="body" className="text-spotify-green font-bold">
                 Inicia sesión
               </CustomText>
             </TouchableOpacity>
           </View>
-          {/*Terms*/}
+          {/*Terminos y condiciones*/}
           <CustomText variant="caption" className="text-center mt-8 text-spotify-gray-light">
             Al registrarte, aceptas nuestras Condiciones de uso y Política de privacidad.
           </CustomText>
