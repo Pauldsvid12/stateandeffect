@@ -1,0 +1,283 @@
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import { CustomText } from '../../components/ui/CustomText';
+import { Ionicons } from '@expo/vector-icons';
+
+interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  imageUrl: string;
+  duration: string;
+}
+
+interface Playlist {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+}
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - 48) / 2; //2 columnas con padding
+
+export default function DashboardScreen() {
+  const [greeting, setGreeting] = useState<string>('');
+  const [recentSongs, setRecentSongs] = useState<Song[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Buenos días');
+    else if (hour < 18) setGreeting('Buenas tardes');
+    else setGreeting('Buenas noches');
+
+    loadData();
+  }, []);
+  const loadData = () => {
+    setTimeout(() => {
+      setRecentSongs([
+        {
+          id: '1',
+          title: 'Blinding Lights',
+          artist: 'The Weeknd',
+          imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300',
+          duration: '3:20',
+        },
+        {
+          id: '2',
+          title: 'Levitating',
+          artist: 'Dua Lipa',
+          imageUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300',
+          duration: '3:23',
+        },
+        {
+          id: '3',
+          title: 'Starboy',
+          artist: 'The Weeknd',
+          imageUrl: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300',
+          duration: '3:50',
+        },
+      ]);
+      setPlaylists([
+        {
+          id: '1',
+          title: 'Top 50 Global',
+          description: 'Las más escuchadas del momento',
+          imageUrl: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300',
+        },
+        {
+          id: '2',
+          title: 'RapCaviar',
+          description: 'Lo mejor del hip-hop',
+          imageUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=300',
+        },
+        {
+          id: '3',
+          title: 'Rock Classics',
+          description: 'Los clásicos que amas',
+          imageUrl: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=300',
+        },
+        {
+          id: '4',
+          title: 'Chill Vibes',
+          description: 'Música relajante',
+          imageUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=300',
+        },
+      ]);
+      setIsLoading(false);
+    }, 1000);
+  };
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-spotify-black items-center justify-center">
+        <CustomText variant="title" className="text-spotify-green">
+          Cargando...
+        </CustomText>
+      </View>
+    );
+  }
+  return (
+    <View className="flex-1 bg-spotify-black">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <Animated.View 
+          entering={FadeInDown.duration(600)}
+          className="px-4 pt-16 pb-4"
+        >
+          <View className="flex-row justify-between items-center mb-6">
+            <CustomText variant="heading" className="text-3xl">
+              {greeting}
+            </CustomText>
+            <View className="flex-row gap-4">
+              <TouchableOpacity>
+                <Ionicons name="notifications-outline" size={28} color="#FFF" />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="time-outline" size={28} color="#FFF" />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="settings-outline" size={28} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Animated.View>
+        {/*Acceso rapido*/}
+        <Animated.View 
+          entering={FadeInDown.delay(100).duration(600)}
+          className="px-4 mb-6"
+        >
+          <View className="flex-row flex-wrap gap-2">
+            {recentSongs.slice(0, 6).map((song, index) => (
+              <Animated.View
+                key={song.id}
+                entering={FadeInRight.delay(index * 100).duration(400)}
+              >
+                <TouchableOpacity
+                  className="bg-spotify-gray/40 rounded-md flex-row items-center overflow-hidden"
+                  style={{ width: CARD_WIDTH }}
+                >
+                  <Image
+                    source={{ uri: song.imageUrl }}
+                    className="w-16 h-16"
+                    resizeMode="cover"
+                  />
+                  <CustomText 
+                    variant="body" 
+                    className="flex-1 ml-3 font-semibold text-sm"
+                    numberOfLines={2}
+                  >
+                    {song.title}
+                  </CustomText>
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </View>
+        </Animated.View>
+        {/*Escuchado recientemente*/}
+        <Animated.View 
+          entering={FadeInDown.delay(200).duration(600)}
+          className="mb-6"
+        >
+          <View className="px-4 mb-4 flex-row justify-between items-center">
+            <CustomText variant="title" className="text-xl">
+              Escuchado recientemente
+            </CustomText>
+            <TouchableOpacity>
+              <CustomText variant="body" className="text-spotify-gray-light">
+                Ver todo
+              </CustomText>
+            </TouchableOpacity>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="px-4 gap-4"
+          >
+            {recentSongs.map((song, index) => (
+              <Animated.View
+                key={song.id}
+                entering={FadeInRight.delay(300 + index * 100).duration(400)}
+              >
+                <TouchableOpacity className="w-36">
+                  <Image
+                    source={{ uri: song.imageUrl }}
+                    className="w-36 h-36 rounded-lg mb-2"
+                    resizeMode="cover"
+                  />
+                  <CustomText 
+                    variant="body" 
+                    className="font-semibold"
+                    numberOfLines={1}
+                  >
+                    {song.title}
+                  </CustomText>
+                  <CustomText 
+                    variant="caption"
+                    numberOfLines={1}
+                  >
+                    {song.artist}
+                  </CustomText>
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </ScrollView>
+        </Animated.View>
+        {/*Playlists buenas*/}
+        <Animated.View 
+          entering={FadeInDown.delay(400).duration(600)}
+          className="mb-6"
+        >
+          <View className="px-4 mb-4">
+            <CustomText variant="title" className="text-xl">
+              Recomendado para ti
+            </CustomText>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="px-4 gap-4"
+          >
+            {playlists.map((playlist, index) => (
+              <Animated.View
+                key={playlist.id}
+                entering={FadeInRight.delay(500 + index * 100).duration(400)}
+              >
+                <TouchableOpacity className="w-36">
+                  <Image
+                    source={{ uri: playlist.imageUrl }}
+                    className="w-36 h-36 rounded-lg mb-2"
+                    resizeMode="cover"
+                  />
+                  <CustomText 
+                    variant="body" 
+                    className="font-semibold"
+                    numberOfLines={1}
+                  >
+                    {playlist.title}
+                  </CustomText>
+                  <CustomText 
+                    variant="caption"
+                    numberOfLines={2}
+                  >
+                    {playlist.description}
+                  </CustomText>
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </ScrollView>
+        </Animated.View>
+        {/*Espaciado*/}
+        <View className="h-24" />
+      </ScrollView>
+      {/*Now Playing Mini Player*/}
+      <Animated.View 
+        entering={FadeInDown.delay(600).duration(600)}
+        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-spotify-gray to-spotify-gray/95 border-t border-spotify-gray"
+      >
+        <TouchableOpacity className="flex-row items-center px-4 py-3">
+          <Image
+            source={{ uri: recentSongs[0]?.imageUrl }}
+            className="w-12 h-12 rounded-md mr-3"
+            resizeMode="cover"
+          />
+          <View className="flex-1">
+            <CustomText variant="body" className="font-semibold" numberOfLines={1}>
+              {recentSongs[0]?.title}
+            </CustomText>
+            <CustomText variant="caption" numberOfLines={1}>
+              {recentSongs[0]?.artist}
+            </CustomText>
+          </View>
+          <TouchableOpacity className="mr-4">
+            <Ionicons name="heart-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Ionicons name="play-circle" size={40} color="#1DB954" />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
+  );
+}
