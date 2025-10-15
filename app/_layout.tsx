@@ -1,5 +1,4 @@
-// app/_layout.tsx
-import { Stack } from 'expo-router';
+import {Stack} from 'expo-router';
 import '../global.css';
 
 export default function RootLayout() {
@@ -8,12 +7,23 @@ export default function RootLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: '#191414' },
+        animation: 'slide_from_right',
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="auth/login" />
-      <Stack.Screen name="auth/register" />
-      <Stack.Screen name="home" />
+      <Stack.Screen 
+        name="(tabs)" 
+        options={{ 
+          headerShown: false,
+          animation: 'fade',
+        }} 
+      />
+      <Stack.Screen 
+        name="+not-found"
+        options={{
+          animation: 'fade',
+        }}
+      />
     </Stack>
   );
 }
