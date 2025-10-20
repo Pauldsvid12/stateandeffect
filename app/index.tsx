@@ -51,11 +51,15 @@ export default function WelcomeScreen() {
   }));
   const handleLoginPress = () => {
     console.log('Login exitoso');
-    router.replace('/(tabs)' as any);
+    router.replace('/(tabs)/`dashboard' as any);
   };
   const handleRegisterPress = () => {
     console.log('Registro exitoso');
-    router.replace('/(tabs)' as any);
+    router.replace('/(tabs)/dashboard' as any);
+  };
+  const handleSocialLogin = (provider: string) => {
+    console.log(`Login con ${provider}`);
+    router.push('/+not-found');
   };
   if (!isLoaded) {
     return (
@@ -118,7 +122,7 @@ export default function WelcomeScreen() {
                   variant="secondary"
                   size="large"
                   iconName="logo-google"
-                  onPress={() => console.log('Google login')}
+                  onPress={() => handleSocialLogin('Google')}
                   className="w-full"
                 />
                 <CustomButton
@@ -126,7 +130,7 @@ export default function WelcomeScreen() {
                   variant="secondary"
                   size="large"
                   iconName="logo-facebook"
-                  onPress={() => console.log('Facebook login')}
+                  onPress={() => console.log('Facebook')}
                   className="w-full"
                 />
                 <CustomButton

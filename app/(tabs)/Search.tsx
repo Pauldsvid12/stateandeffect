@@ -10,10 +10,13 @@ interface Category {
   color: string;
   icon: string;
 }
+
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
+
 export default function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
+
   const categories: Category[] = [
     { id: '1', title: 'Pop', color: '#8E44AD', icon: '🎤' },
     { id: '2', title: 'Rock', color: '#E74C3C', icon: '🎸' },
@@ -24,6 +27,7 @@ export default function SearchScreen() {
     { id: '7', title: 'Clásica', color: '#1ABC9C', icon: '🎻' },
     { id: '8', title: 'Indie', color: '#34495E', icon: '🌿' },
   ];
+
   return (
     <View className="flex-1 bg-spotify-black">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -35,8 +39,9 @@ export default function SearchScreen() {
           <CustomText variant="heading" className="text-3xl mb-6">
             Buscar
           </CustomText>
-          {/*Barra de busqueda*/}
-          <View className="bg-white rounded-lg flex-row items-center px-4 py-3 mb-6">
+
+          {/* Search Bar */}
+          <View className="bg-white/90 rounded-lg flex-row items-center px-4 py-3 mb-6">
             <Ionicons name="search" size={24} color="#000" />
             <TextInput
               className="flex-1 ml-3 text-black text-base"
@@ -52,7 +57,8 @@ export default function SearchScreen() {
             )}
           </View>
         </Animated.View>
-        {/*Categorias*/}
+
+        {/* Categories */}
         <Animated.View 
           entering={FadeInDown.delay(100).duration(600)}
           className="px-4"
@@ -60,6 +66,7 @@ export default function SearchScreen() {
           <CustomText variant="title" className="text-xl mb-4">
             Explorar por género
           </CustomText>
+
           <View className="flex-row flex-wrap gap-4 mb-20">
             {categories.map((category, index) => (
               <Animated.View

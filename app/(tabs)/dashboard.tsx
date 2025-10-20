@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { CustomText } from '../../components/ui/CustomText';
-import { Ionicons } from '@expo/vector-icons';
 
 interface Song {
   id: string;
@@ -18,10 +19,12 @@ interface Playlist {
   description: string;
   imageUrl: string;
 }
+
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 48) / 2; //2 columnas con padding
+const CARD_WIDTH = (width - 48) / 2; // 2 columnas con padding
 
 export default function DashboardScreen() {
+  const router = useRouter();
   const [greeting, setGreeting] = useState<string>('');
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -35,14 +38,15 @@ export default function DashboardScreen() {
 
     loadData();
   }, []);
+
   const loadData = () => {
     setTimeout(() => {
       setRecentSongs([
         {
           id: '1',
-          title: 'Blinding Lights',
-          artist: 'The Weeknd',
-          imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300',
+          title: 'NerverMind',
+          artist: 'Nirvana',
+          imageUrl: 'https://imagenes.elpais.com/resizer/v2/J4MZMQKLQYOZ7RQXT3P5TPN7QM.jpg?auth=39f04afc389740f724fbe5266c605ad15646844cbfbe19c04fbbda0566e0f4af&width=980&height=980&focal=196%2C103',
           duration: '3:20',
         },
         {
@@ -54,12 +58,13 @@ export default function DashboardScreen() {
         },
         {
           id: '3',
-          title: 'Starboy',
-          artist: 'The Weeknd',
-          imageUrl: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300',
+          title: 'In Utero',
+          artist: 'Nirvana',
+          imageUrl: 'https://i5.walmartimages.com/seo/Nirvana-In-Utero-Music-Performance-Vinyl_83637d16-f51c-4311-a9ac-48969d7be7ab.e98314b55e3b08516bfadd468609c4bc.jpeg',
           duration: '3:50',
         },
       ]);
+
       setPlaylists([
         {
           id: '1',
@@ -86,9 +91,11 @@ export default function DashboardScreen() {
           imageUrl: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=300',
         },
       ]);
+
       setIsLoading(false);
     }, 1000);
   };
+
   if (isLoading) {
     return (
       <View className="flex-1 bg-spotify-black items-center justify-center">
@@ -98,6 +105,7 @@ export default function DashboardScreen() {
       </View>
     );
   }
+
   return (
     <View className="flex-1 bg-spotify-black">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -123,7 +131,8 @@ export default function DashboardScreen() {
             </View>
           </View>
         </Animated.View>
-        {/*Acceso rapido*/}
+
+        {/* Quick Access */}
         <Animated.View 
           entering={FadeInDown.delay(100).duration(600)}
           className="px-4 mb-6"
@@ -135,7 +144,7 @@ export default function DashboardScreen() {
                 entering={FadeInRight.delay(index * 100).duration(400)}
               >
                 <TouchableOpacity
-                  className="bg-spotify-gray/40 rounded-md flex-row items-center overflow-hidden"
+                  className="bg-spotify-gray rounded-md flex-row items-center overflow-hidden"
                   style={{ width: CARD_WIDTH }}
                 >
                   <Image
@@ -155,7 +164,8 @@ export default function DashboardScreen() {
             ))}
           </View>
         </Animated.View>
-        {/*Escuchado recientemente*/}
+
+        {/* Recently Played */}
         <Animated.View 
           entering={FadeInDown.delay(200).duration(600)}
           className="mb-6"
@@ -170,6 +180,7 @@ export default function DashboardScreen() {
               </CustomText>
             </TouchableOpacity>
           </View>
+          
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -204,7 +215,8 @@ export default function DashboardScreen() {
             ))}
           </ScrollView>
         </Animated.View>
-        {/*Playlists buenas*/}
+
+        {/* Playlists Recomendadas */}
         <Animated.View 
           entering={FadeInDown.delay(400).duration(600)}
           className="mb-6"
@@ -214,6 +226,7 @@ export default function DashboardScreen() {
               Recomendado para ti
             </CustomText>
           </View>
+          
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -248,15 +261,20 @@ export default function DashboardScreen() {
             ))}
           </ScrollView>
         </Animated.View>
-        {/*Espaciado*/}
+
+        {/* Espaciado para el Now Playing */}
         <View className="h-24" />
       </ScrollView>
-      {/*Now Playing Mini Player*/}
+
+      {/* Now Playing Mini Player */}
       <Animated.View 
         entering={FadeInDown.delay(600).duration(600)}
-        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-spotify-gray to-spotify-gray/95 border-t border-spotify-gray"
+        className="absolute bottom-0 left-0 right-0 bg-spotify-gray border-t border-spotify-gray-light/20"
       >
-        <TouchableOpacity className="flex-row items-center px-4 py-3">
+        <TouchableOpacity 
+          className="flex-row items-center px-4 py-3"
+          onPress={() => router.push('/NowPlaying')}
+        >
           <Image
             source={{ uri: recentSongs[0]?.imageUrl }}
             className="w-12 h-12 rounded-md mr-3"

@@ -67,7 +67,7 @@ export default function NotFoundScreen() {
           variant="outline"
           size="large"
           iconName="grid"
-          onPress={() => router.replace('./(tabs)')}
+          onPress={() => router.replace('./dashboard')}
           className="w-full"
         />
       </Animated.View>

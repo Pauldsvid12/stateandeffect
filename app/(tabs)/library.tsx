@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
-import { CustomButton } from '../../components/ui/CustomButton';
 import { CustomText } from '../../components/ui/CustomText';
+import { CustomButton } from '../../components/ui/CustomButton';
+import { Ionicons } from '@expo/vector-icons';
 
 interface LibraryItem {
   id: string;
@@ -13,8 +13,10 @@ interface LibraryItem {
   type: 'playlist' | 'album' | 'artist';
   isPinned?: boolean;
 }
+
 export default function LibraryScreen() {
   const [filter, setFilter] = useState<'all' | 'playlists' | 'albums' | 'artists'>('all');
+
   const libraryItems: LibraryItem[] = [
     {
       id: '1',
@@ -53,6 +55,7 @@ export default function LibraryScreen() {
       type: 'playlist',
     },
   ];
+
   const filteredItems = filter === 'all' 
     ? libraryItems 
     : libraryItems.filter(item => {
@@ -61,10 +64,11 @@ export default function LibraryScreen() {
         if (filter === 'artists') return item.type === 'artist';
         return true;
       });
+
   return (
     <View className="flex-1 bg-spotify-black">
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/*Header*/}
+        {/* Header */}
         <Animated.View 
           entering={FadeInDown.duration(600)}
           className="px-4 pt-16 pb-4"
@@ -82,7 +86,8 @@ export default function LibraryScreen() {
               </TouchableOpacity>
             </View>
           </View>
-          {/*Filtros*/}
+
+          {/* Filters */}
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -91,7 +96,7 @@ export default function LibraryScreen() {
             <TouchableOpacity 
               onPress={() => setFilter('all')}
               className={`px-4 py-2 rounded-full ${
-                filter === 'all' ? 'bg-spotify-green' : 'bg-spotify-gray/40'
+                filter === 'all' ? 'bg-spotify-green' : 'bg-spotify-gray'
               }`}
             >
               <CustomText 
@@ -103,6 +108,7 @@ export default function LibraryScreen() {
                 Todos
               </CustomText>
             </TouchableOpacity>
+
             <TouchableOpacity 
               onPress={() => setFilter('playlists')}
               className={`px-4 py-2 rounded-full ${
@@ -118,6 +124,7 @@ export default function LibraryScreen() {
                 Playlists
               </CustomText>
             </TouchableOpacity>
+
             <TouchableOpacity 
               onPress={() => setFilter('albums')}
               className={`px-4 py-2 rounded-full ${
@@ -133,6 +140,7 @@ export default function LibraryScreen() {
                 Álbumes
               </CustomText>
             </TouchableOpacity>
+
             <TouchableOpacity 
               onPress={() => setFilter('artists')}
               className={`px-4 py-2 rounded-full ${
@@ -150,7 +158,8 @@ export default function LibraryScreen() {
             </TouchableOpacity>
           </ScrollView>
         </Animated.View>
-        {/*Biblioteca*/}
+
+        {/* Library Items */}
         <Animated.View 
           entering={FadeInDown.delay(100).duration(600)}
           className="px-4 pb-24"
@@ -192,6 +201,7 @@ export default function LibraryScreen() {
               </TouchableOpacity>
             </Animated.View>
           ))}
+
           {filteredItems.length === 0 && (
             <View className="items-center justify-center py-20">
               <Ionicons name="musical-notes-outline" size={80} color="#535353" />

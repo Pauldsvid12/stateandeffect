@@ -1,10 +1,10 @@
+import React, { useState } from 'react';
+import { View, ScrollView, TouchableOpacity, Image, Switch } from 'react-native';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import { CustomText } from '../../components/ui/CustomText';
+import { CustomButton } from '../../components/ui/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Image, ScrollView, Switch, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
-import { CustomButton } from '../../components/ui/CustomButton';
-import { CustomText } from '../../components/ui/CustomText';
 
 interface SettingItem {
   id: string;
@@ -16,6 +16,7 @@ interface SettingItem {
   toggleValue?: boolean;
   onToggle?: (value: boolean) => void;
 }
+
 export default function ProfileScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = useState(true);
@@ -45,6 +46,7 @@ export default function ProfileScreen() {
       onPress: () => console.log('Privacidad'),
     },
   ];
+
   const appSettings: SettingItem[] = [
     {
       id: '4',
@@ -79,14 +81,16 @@ export default function ProfileScreen() {
       onPress: () => console.log('Idioma'),
     },
   ];
+
   const handleLogout = () => {
     console.log('Cerrando sesión...');
     router.replace('/');
   };
+
   return (
     <View className="flex-1 bg-spotify-black">
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/*Perfil con header*/}
+        {/* Header con perfil */}
         <Animated.View 
           entering={FadeInDown.duration(600)}
           className="px-4 pt-16 pb-6"
@@ -95,8 +99,8 @@ export default function ProfileScreen() {
             Perfil
           </CustomText>
 
-          {/*Informacion del usuario*/}
-          <TouchableOpacity className="bg-spotify-gray/30 rounded-2xl p-6 flex-row items-center mb-6">
+          {/* User Info Card */}
+          <TouchableOpacity className="bg-spotify-gray rounded-2xl p-6 flex-row items-center mb-6">
             <Image
               source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200' }}
               className="w-20 h-20 rounded-full mr-4"
@@ -104,10 +108,10 @@ export default function ProfileScreen() {
             />
             <View className="flex-1">
               <CustomText variant="title" className="text-xl mb-1">
-                Usuario Demo
+                David JM
               </CustomText>
               <CustomText variant="caption" className="mb-2">
-                demo@spotify.com
+                paul.juelam.est@uets.edu
               </CustomText>
               <View className="bg-spotify-green/20 px-3 py-1 rounded-full self-start">
                 <CustomText variant="caption" className="text-spotify-green font-semibold">
@@ -117,7 +121,8 @@ export default function ProfileScreen() {
             </View>
             <Ionicons name="chevron-forward" size={24} color="#B3B3B3" />
           </TouchableOpacity>
-          {/*Stats*/}
+
+          {/* Stats */}
           <View className="flex-row gap-4 mb-6">
             <View className="flex-1 bg-spotify-gray/30 rounded-xl p-4 items-center">
               <CustomText variant="title" className="text-2xl mb-1 text-spotify-green">
@@ -145,7 +150,8 @@ export default function ProfileScreen() {
             </View>
           </View>
         </Animated.View>
-        {/*ajustes de cuentas*/}
+
+        {/* Account Settings */}
         <Animated.View 
           entering={FadeInDown.delay(100).duration(600)}
           className="px-4 mb-6"
@@ -153,6 +159,7 @@ export default function ProfileScreen() {
           <CustomText variant="title" className="text-lg mb-4">
             Cuenta
           </CustomText>
+
           {accountSettings.map((setting, index) => (
             <Animated.View
               key={setting.id}
@@ -180,7 +187,8 @@ export default function ProfileScreen() {
             </Animated.View>
           ))}
         </Animated.View>
-        {/*configuracion de la app*/}
+
+        {/* App Settings */}
         <Animated.View 
           entering={FadeInDown.delay(200).duration(600)}
           className="px-4 mb-6"
@@ -188,6 +196,7 @@ export default function ProfileScreen() {
           <CustomText variant="title" className="text-lg mb-4">
             Configuración
           </CustomText>
+
           {appSettings.map((setting, index) => (
             <Animated.View
               key={setting.id}
@@ -225,7 +234,8 @@ export default function ProfileScreen() {
             </Animated.View>
           ))}
         </Animated.View>
-        {/*Otras opciones*/}
+
+        {/* Other Options */}
         <Animated.View 
           entering={FadeInDown.delay(400).duration(600)}
           className="px-4 mb-6"
@@ -254,7 +264,8 @@ export default function ProfileScreen() {
             <Ionicons name="chevron-forward" size={24} color="#B3B3B3" />
           </TouchableOpacity>
         </Animated.View>
-        {/*Cerrar sesion boton*/}
+
+        {/* Logout Button */}
         <Animated.View 
           entering={FadeInDown.delay(500).duration(600)}
           className="px-4 pb-24"
@@ -267,8 +278,9 @@ export default function ProfileScreen() {
             onPress={handleLogout}
             className="w-full"
           />
+
           <CustomText variant="caption" className="text-center mt-6 text-spotify-gray">
-            Versión 2.2 GD
+            Versión 2.2.0 • Creado con Robtop
           </CustomText>
         </Animated.View>
       </ScrollView>

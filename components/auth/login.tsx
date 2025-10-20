@@ -1,5 +1,7 @@
+// components/auth/Login.tsx
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
-import React, { useEffect, useState} from 'react';
 import { CustomButton } from '../ui/CustomButton';
 import { CustomText } from '../ui/CustomText';
 
@@ -22,6 +24,7 @@ export const Login: React.FC<LoginProps> = ({
   onSwitchToRegister, 
   onBack 
 }) => {
+  const router = useRouter();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -30,12 +33,13 @@ export const Login: React.FC<LoginProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
-
+  
   useEffect(() => {//validar el email
     if (formData.email && errors.email) {
       validateEmail(formData.email);
     }
   }, [formData.email]);
+  
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -45,6 +49,7 @@ export const Login: React.FC<LoginProps> = ({
     setErrors(prev => ({ ...prev, email: undefined }));
     return true;
   };
+  
   const validateForm = (): boolean => {
     const newErrors: LoginErrors = {};
     if (!formData.email.trim()) {
@@ -58,6 +63,7 @@ export const Login: React.FC<LoginProps> = ({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
   const handleLogin = async () => {
     if (!validateForm()) return;
     setIsLoading(true);
@@ -72,16 +78,19 @@ export const Login: React.FC<LoginProps> = ({
       }
     }, 2000);
   };
+  
   const handleInputChange = (field: keyof LoginFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors.general) {//eliminar el error al cambiar los datos
       setErrors(prev => ({ ...prev, general: undefined }));
     }
   };
+  
   const handleSocialLogin = (provider: string) => {
     console.log(`Login con ${provider}`);
+    router.push('/+not-found');
   };
-
+  
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -106,6 +115,7 @@ export const Login: React.FC<LoginProps> = ({
             Accede a tu cuenta de Spotify
           </CustomText>
         </View>
+        
         {/*Login con otras redes*/}
         <View className="gap-3 mb-6">
           <CustomButton
@@ -130,6 +140,7 @@ export const Login: React.FC<LoginProps> = ({
             onPress={() => handleSocialLogin('Apple')}
           />
         </View>
+        
         {/*Dividir*/}
         <View className="flex-row items-center my-6">
           <View className="flex-1 h-[1px] bg-spotify-gray" />
@@ -138,6 +149,7 @@ export const Login: React.FC<LoginProps> = ({
           </CustomText>
           <View className="flex-1 h-[1px] bg-spotify-gray" />
         </View>
+        
         {/*Error general*/}
         {errors.general && (
           <View className="bg-red-500/20 border border-red-500 rounded-lg p-3 mb-4">
@@ -146,6 +158,7 @@ export const Login: React.FC<LoginProps> = ({
             </CustomText>
           </View>
         )}
+        
         {/*Form*/}
         <View className="gap-4">
           {/*ingresar email*/}
@@ -170,6 +183,7 @@ export const Login: React.FC<LoginProps> = ({
               </CustomText>
             )}
           </View>
+          
           {/*Ingresar contraseña*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
@@ -192,6 +206,7 @@ export const Login: React.FC<LoginProps> = ({
               </CustomText>
             )}
           </View>
+          
           {/*ver o no ver contraseña*/}
           <TouchableOpacity 
             onPress={() => setPasswordVisible(!passwordVisible)}
@@ -201,6 +216,7 @@ export const Login: React.FC<LoginProps> = ({
               {passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             </CustomText>
           </TouchableOpacity>
+          
           {/*Recordar*/}
           <TouchableOpacity 
             onPress={() => setRememberMe(!rememberMe)}
@@ -219,6 +235,7 @@ export const Login: React.FC<LoginProps> = ({
               Recuérdame
             </CustomText>
           </TouchableOpacity>
+          
           {/*Boton de login*/}
           <CustomButton
             title="Iniciar sesión"
@@ -228,14 +245,17 @@ export const Login: React.FC<LoginProps> = ({
             isLoading={isLoading}
             className="mt-4"
           />
+          
           {/*Olvidaste tu contraseña*/}
           <TouchableOpacity className="self-center mt-2">
             <CustomText variant="body" className="text-white underline">
               ¿Olvidaste tu contraseña?
             </CustomText>
           </TouchableOpacity>
+          
           {/*dividir*/}
           <View className="h-[1px] bg-spotify-gray my-4" />
+          
           {/*Link para registrase*/}
           <View className="flex-row justify-center items-center">
             <CustomText variant="body" className="text-spotify-gray-light">
@@ -247,10 +267,11 @@ export const Login: React.FC<LoginProps> = ({
               </CustomText>
             </TouchableOpacity>
           </View>
+          
           {/* DATOS A INGRESAR*/}
           <View className="mt-8 p-4 bg-spotify-green/10 rounded-lg border border-spotify-green/30">
             <CustomText variant="caption" className="text-spotify-green text-center">
-              Probar: paul.juelam.est@uets.edu.ec / edgewwe321
+              Probar: paul.juelam.est@uets.edu.ec / edgewwe123
             </CustomText>
           </View>
         </View>
