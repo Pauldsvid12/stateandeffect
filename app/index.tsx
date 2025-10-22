@@ -6,7 +6,7 @@ import { Image, ImageBackground, StatusBar, View } from 'react-native';
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { CustomButton } from '../components/ui/CustomButton';
 import { CustomText } from '../components/ui/CustomText';
-
+import {z} from "zod";
 export default function WelcomeScreen() {
   const router = useRouter();
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
