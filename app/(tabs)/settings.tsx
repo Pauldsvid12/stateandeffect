@@ -1,4 +1,3 @@
-// app/settings.tsx
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';

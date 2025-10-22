@@ -1,4 +1,3 @@
-// app/now-playing.tsx
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';

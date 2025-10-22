@@ -1,10 +1,9 @@
-// components/auth/Login.tsx
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import { CustomButton } from '../ui/CustomButton';
 import { CustomText } from '../ui/CustomText';
-
+import {z} from "zod";
 interface LoginFormData {
   email: string;
   password: string;
