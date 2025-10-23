@@ -1,7 +1,18 @@
-import {View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform} from 'react-native';
-import React, {useState, useEffect} from 'react';
-import { CustomText } from '../ui/CustomText';
+import React, { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import { CustomButton } from '../ui/CustomButton';
+import { CustomText } from '../ui/CustomText';
+import { useRouter } from 'expo-router';
+import { validateEmail } from '@/lib/validations/emailSchema';
+import { validatePassword } from '@/lib/validations/passwordSchema';
+import { validateUsername } from '@/lib/validations/usernameSchema';
+import { validateRegisterForm } from '@/lib/validations/registerSchema';
+import { 
+  EMAIL_REQUIRED_MESSAGE,
+  PASSWORD_REQUIRED_MESSAGE,
+  USERNAME_REQUIRED_MESSAGE,
+  REGISTER_SUCCESS_MESSAGE
+} from '@/constants/errorMessages';
 
 interface FormData {
   email: string;
@@ -9,22 +20,26 @@ interface FormData {
   confirmPassword: string;
   username: string;
 }
+
 interface FormErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
   username?: string;
 }
+
 interface RegisterProps {
   onRegisterSuccess: () => void;
   onSwitchToLogin: () => void;
   onBack: () => void;
 }
+
 export const Register: React.FC<RegisterProps> = ({ 
   onRegisterSuccess, 
   onSwitchToLogin, 
   onBack 
 }) => {
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -35,63 +50,86 @@ export const Register: React.FC<RegisterProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
-  useEffect(() => {//validacion en tiempo real
+  // Validación en tiempo real del email
+  useEffect(() => {
     if (formData.email && errors.email) {
-      validateEmail(formData.email);
+      const errorMessage = validateEmail(formData.email);
+      if (errorMessage) {
+        setErrors(prev => ({ ...prev, email: errorMessage }));
+      } else {
+        setErrors(prev => ({ ...prev, email: undefined }));
+      }
     }
   }, [formData.email]);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrors(prev => ({ ...prev, email: 'Correo electrónico inválido' }));
-      return false;
+  // Validación en tiempo real del username
+  useEffect(() => {
+    if (formData.username && errors.username) {
+      const errorMessage = validateUsername(formData.username);
+      if (errorMessage) {
+        setErrors(prev => ({ ...prev, username: errorMessage }));
+      } else {
+        setErrors(prev => ({ ...prev, username: undefined }));
+      }
     }
-    setErrors(prev => ({ ...prev, email: undefined }));
-    return true;
-  };
-  const validatePassword = (password: string): boolean => {
-    if (password.length < 8) {
-      setErrors(prev => ({ ...prev, password: 'La contraseña debe tener al menos 8 caracteres' }));
-      return false;
+  }, [formData.username]);
+
+  // Validación en tiempo real de la contraseña
+  useEffect(() => {
+    if (formData.password && errors.password) {
+      const errorMessage = validatePassword(formData.password, false);
+      if (errorMessage) {
+        setErrors(prev => ({ ...prev, password: errorMessage }));
+      } else {
+        setErrors(prev => ({ ...prev, password: undefined }));
+      }
     }
-    setErrors(prev => ({ ...prev, password: undefined }));
-    return true;
-  };
+  }, [formData.password]);
+
+  // Validación en tiempo real de confirmación de contraseña
+  useEffect(() => {
+    if (formData.confirmPassword && errors.confirmPassword) {
+      if (formData.password !== formData.confirmPassword) {
+        setErrors(prev => ({ ...prev, confirmPassword: 'Las contraseñas no coinciden' }));
+      } else {
+        setErrors(prev => ({ ...prev, confirmPassword: undefined }));
+      }
+    }
+  }, [formData.confirmPassword, formData.password]);
+
+  // Validación completa del formulario usando el schema
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-    if (!formData.username.trim()) {
-      newErrors.username = 'El nombre de usuario es requerido';
+    const validationErrors = validateRegisterForm(formData);
+    
+    if (validationErrors) {
+      setErrors(validationErrors);
+      return false;
     }
-    if (!formData.email.trim()) {
-      newErrors.email = 'El correo es requerido';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Correo electrónico inválido';
-    }
-    if (!formData.password) {
-      newErrors.password = 'La contraseña es requerida';
-    } else if (!validatePassword(formData.password)) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    setErrors({});
+    return true;
   };
 
   const handleRegister = async () => {
     if (!validateForm()) return;
+    
     setIsLoading(true);
-    setTimeout(() => {//simular registro
+    
+    // Simular registro
+    setTimeout(() => {
       setIsLoading(false);
       console.log('Registro exitoso:', formData);
+      
+      // Redirigir al dashboard
+      router.push('/(tabs)/dashboard');
       onRegisterSuccess();
     }, 2000);
   };
+
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -100,6 +138,7 @@ export const Register: React.FC<RegisterProps> = ({
       <ScrollView 
         className="flex-1 bg-spotify-black"
         contentContainerClassName="px-6 pt-16 pb-8"
+        showsVerticalScrollIndicator={false}
       >
         {/*Header*/}
         <View className="mb-8">
@@ -116,9 +155,10 @@ export const Register: React.FC<RegisterProps> = ({
             Regístrate gratis y empieza a escuchar
           </CustomText>
         </View>
+
         {/*Form*/}
         <View className="gap-4">
-          {/*Ingresar nombre del usuario*/}
+          {/*Ingresar nombre del usuario - Validado con Schema*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Nombre de usuario
@@ -133,13 +173,15 @@ export const Register: React.FC<RegisterProps> = ({
               onChangeText={(value) => handleInputChange('username', value)}
               autoCapitalize="none"
             />
+            {/* Renderizado condicional del error de username */}
             {errors.username && (
               <CustomText variant="caption" className="text-red-500 mt-1">
                 {errors.username}
               </CustomText>
             )}
           </View>
-          {/*Ingresar correo*/}
+
+          {/*Ingresar correo - Validado con Schema*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Correo electrónico
@@ -155,13 +197,15 @@ export const Register: React.FC<RegisterProps> = ({
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            {/* Renderizado condicional del error de email */}
             {errors.email && (
               <CustomText variant="caption" className="text-red-500 mt-1">
                 {errors.email}
               </CustomText>
             )}
           </View>
-          {/*Ingresar contraseña*/}
+
+          {/*Ingresar contraseña - Validado con Schema*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Contraseña
@@ -177,13 +221,15 @@ export const Register: React.FC<RegisterProps> = ({
               secureTextEntry={!passwordVisible}
               autoCapitalize="none"
             />
+            {/* Renderizado condicional del error de password */}
             {errors.password && (
               <CustomText variant="caption" className="text-red-500 mt-1">
                 {errors.password}
               </CustomText>
             )}
           </View>
-          {/*Ingresar confimacion de la contraseña*/}
+
+          {/*Ingresar confirmación de la contraseña - Validado con Schema*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Confirmar contraseña
@@ -199,12 +245,14 @@ export const Register: React.FC<RegisterProps> = ({
               secureTextEntry={!passwordVisible}
               autoCapitalize="none"
             />
+            {/* Renderizado condicional del error de confirmPassword */}
             {errors.confirmPassword && (
               <CustomText variant="caption" className="text-red-500 mt-1">
                 {errors.confirmPassword}
               </CustomText>
             )}
           </View>
+
           {/*Ver o no ver contraseña*/}
           <TouchableOpacity 
             onPress={() => setPasswordVisible(!passwordVisible)}
@@ -214,7 +262,8 @@ export const Register: React.FC<RegisterProps> = ({
               {passwordVisible ? 'Ocultar contraseñas' : 'Mostrar contraseñas'}
             </CustomText>
           </TouchableOpacity>
-          {/*boton de registro*/}
+
+          {/*Boton de registro*/}
           <CustomButton
             title="Registrarse"
             variant="primary"
@@ -223,6 +272,7 @@ export const Register: React.FC<RegisterProps> = ({
             isLoading={isLoading}
             className="mt-4"
           />
+
           {/*Ir a loguearte*/}
           <View className="flex-row justify-center items-center mt-6">
             <CustomText variant="body" className="text-spotify-gray-light">
@@ -234,7 +284,8 @@ export const Register: React.FC<RegisterProps> = ({
               </CustomText>
             </TouchableOpacity>
           </View>
-          {/*Terminos y condiciones*/}
+
+          {/*Términos y condiciones*/}
           <CustomText variant="caption" className="text-center mt-8 text-spotify-gray-light">
             Al registrarte, aceptas nuestras Condiciones de uso y Política de privacidad.
           </CustomText>

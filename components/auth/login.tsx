@@ -1,23 +1,28 @@
+import { EMAIL_REQUIRED_MESSAGE, GENERAL_LOGIN_ERROR, PASSWORD_REQUIRED_MESSAGE } from '@/constants/errorMessages';
+import { validateEmail } from '@/lib/validations/emailSchema';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import { CustomButton } from '../ui/CustomButton';
 import { CustomText } from '../ui/CustomText';
-import {z} from "zod";
+
 interface LoginFormData {
   email: string;
   password: string;
 }
+
 interface LoginErrors {
   email?: string;
   password?: string;
   general?: string;
 }
+
 interface LoginProps {
   onLoginSuccess: () => void;
   onSwitchToRegister: () => void;
   onBack: () => void;
 }
+
 export const Login: React.FC<LoginProps> = ({ 
   onLoginSuccess, 
   onSwitchToRegister, 
@@ -33,54 +38,61 @@ export const Login: React.FC<LoginProps> = ({
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   
-  useEffect(() => {//validar el email
+  // Validación en tiempo real del email usando el schema
+  useEffect(() => {
     if (formData.email && errors.email) {
-      validateEmail(formData.email);
+      const errorMessage = validateEmail(formData.email);
+      if (errorMessage) {
+        setErrors(prev => ({ ...prev, email: errorMessage }));
+      } else {
+        setErrors(prev => ({ ...prev, email: undefined }));
+      }
     }
   }, [formData.email]);
   
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrors(prev => ({ ...prev, email: 'Correo electrónico inválido' }));
-      return false;
-    }
-    setErrors(prev => ({ ...prev, email: undefined }));
-    return true;
-  };
-  
+  // Validación del formulario completo usando el schema
   const validateForm = (): boolean => {
     const newErrors: LoginErrors = {};
+    
+    // Validar email con el schema de Zod
     if (!formData.email.trim()) {
-      newErrors.email = 'El correo es requerido';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Correo electrónico inválido';
+      newErrors.email = EMAIL_REQUIRED_MESSAGE;
+    } else {
+      const emailError = validateEmail(formData.email);
+      if (emailError) {
+        newErrors.email = emailError;
+      }
     }
+    
+    // Validar password
     if (!formData.password) {
-      newErrors.password = 'La contraseña es requerida';
+      newErrors.password = PASSWORD_REQUIRED_MESSAGE;
     }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   
   const handleLogin = async () => {
     if (!validateForm()) return;
+    
     setIsLoading(true);
     setErrors({});
-    setTimeout(() => {//se simula el logueo
+    
+    setTimeout(() => {
       setIsLoading(false);
-      if (formData.email === 'paul.juelam.est@uets.edu.ec' && formData.password === 'edgewwe123') {//validacion de los datos
+      if (formData.email === 'paul.juelam.est@uets.edu.ec' && formData.password === 'edgewwe123') {
         console.log('Login exitoso:', formData);
         onLoginSuccess();
       } else {
-        setErrors({ general: 'Correo o contraseña incorrectos' });
+        setErrors({ general: GENERAL_LOGIN_ERROR });
       }
     }, 2000);
   };
   
   const handleInputChange = (field: keyof LoginFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors.general) {//eliminar el error al cambiar los datos
+    if (errors.general) {
       setErrors(prev => ({ ...prev, general: undefined }));
     }
   };
@@ -149,7 +161,7 @@ export const Login: React.FC<LoginProps> = ({
           <View className="flex-1 h-[1px] bg-spotify-gray" />
         </View>
         
-        {/*Error general*/}
+        {/*Error general - Renderizado condicional*/}
         {errors.general && (
           <View className="bg-red-500/20 border border-red-500 rounded-lg p-3 mb-4">
             <CustomText variant="body" className="text-red-500 text-center">
@@ -160,7 +172,7 @@ export const Login: React.FC<LoginProps> = ({
         
         {/*Form*/}
         <View className="gap-4">
-          {/*ingresar email*/}
+          {/*Ingresar email - Validado con Schema*/}
           <View>
             <CustomText variant="caption" className="mb-2 text-white">
               Correo electrónico o nombre de usuario
@@ -176,6 +188,7 @@ export const Login: React.FC<LoginProps> = ({
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            {/* Renderizado condicional del error de email */}
             {errors.email && (
               <CustomText variant="caption" className="text-red-500 mt-1">
                 {errors.email}
@@ -199,6 +212,7 @@ export const Login: React.FC<LoginProps> = ({
               secureTextEntry={!passwordVisible}
               autoCapitalize="none"
             />
+            {/* Renderizado condicional del error de password */}
             {errors.password && (
               <CustomText variant="caption" className="text-red-500 mt-1">
                 {errors.password}
